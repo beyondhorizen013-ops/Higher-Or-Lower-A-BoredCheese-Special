@@ -6,98 +6,32 @@
     <title>BoredCheese | Higher or Lower</title>
     <style>
         body { font-family: 'Arial Black', sans-serif; background: #000; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        
+        /* Name Input Screen */
+        #name-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #d4a017; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; color: black; }
+        #player-name { padding: 15px; font-size: 1.5rem; border: 3px solid black; margin-bottom: 20px; text-align: center; font-family: inherit; }
+
         .game-container { display: flex; width: 100%; height: 100%; }
         .side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; transition: 0.5s; position: relative; }
         .left { background: #d4a017; color: black; }
         .right { background: #222; }
+        
         h2 { font-size: 3rem; margin: 10px 0; }
-        .score { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 10px 20px; border-radius: 50px; font-size: 1.5rem; z-index: 10; }
-        .btn-container { margin-top: 20px; }
-        button { background: transparent; border: 2px solid white; color: white; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; margin: 5px; font-family: inherit; transition: 0.2s; }
+        .score-hud { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 10px 20px; border: 3px solid black; font-size: 1.2rem; z-index: 10; font-weight: bold; }
+        
+        button { background: transparent; border: 3px solid white; color: white; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; margin: 5px; font-family: inherit; transition: 0.2s; font-weight: bold; }
         button:hover { background: white; color: black; }
-        .stat { font-size: 2rem; font-weight: bold; }
-        #game-over { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .stat { font-size: 2.5rem; font-weight: bold; }
+
+        /* Game Over & Leaderboard */
+        #game-over { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .leaderboard { margin: 20px 0; background: #333; padding: 20px; border: 2px solid #d4a017; min-width: 300px; }
+        .leaderboard-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #555; padding: 5px 0; }
     </style>
 </head>
 <body>
 
-    <div class="score">Score: <span id="current-score">0</span></div>
-
-    <div class="game-container">
-        <div class="side left">
-            <p>CHEDDAR CHEESE HAS</p>
-            <h2 id="left-name">Cheddar</h2>
-            <p class="stat">5,000,000</p>
-            <p>SEARCHES</p>
-        </div>
-
-        <div class="side right" id="right-side">
-            <p>MOZZARELLA HAS</p>
-            <h2 id="right-name">Mozzarella</h2>
-            <div class="btn-container" id="guess-buttons">
-                <button onclick="checkAnswer('higher')">▲ HIGHER</button>
-                <button onclick="checkAnswer('lower')">▼ LOWER</button>
-            </div>
-            <p>SEARCHES THAN CHEDDAR</p>
-        </div>
-    </div>
-
-    <div id="game-over">
-        <h1>GAME OVER</h1>
-        <p>You failed the cheese test.</p>
-        <h2>Final Score: <span id="final-score">0</span></h2>
-        <button onclick="location.reload()">TRY AGAIN</button>
-    </div>
-
-    <script>
-        const data = [
-            { name: "Cheddar", value: 5000000 },
-            { name: "Mozzarella", value: 8200000 },
-            { name: "Swiss Cheese", value: 2100000 },
-            { name: "Brie", value: 4500000 },
-            { name: "Blue Cheese", value: 3800000 },
-            { name: "Parmesan", value: 7100000 },
-            { name: "Cheese Curds", value: 900000 },
-            { name: "Gouda", value: 3200000 }
-        ];
-
-        let score = 0;
-        let leftItem = data[0];
-        let rightItem = data[1];
-
-        function checkAnswer(guess) {
-            const correct = (guess === 'higher' && rightItem.value > leftItem.value) || 
-                            (guess === 'lower' && rightItem.value < leftItem.value);
-
-            if (correct) {
-                score++;
-                document.getElementById('current-score').innerText = score;
-                nextRound();
-            } else {
-                showGameOver();
-            }
-        }
-
-        function nextRound() {
-            leftItem = rightItem;
-            // Pick a random new item that isn't the current left one
-            let nextIndex;
-            do {
-                nextIndex = Math.floor(Math.random() * data.length);
-            } while (data[nextIndex].name === leftItem.name);
-            
-            rightItem = data[nextIndex];
-
-            // Update UI
-            document.getElementById('left-name').innerText = leftItem.name;
-            document.querySelector('.left .stat').innerText = leftItem.value.toLocaleString();
-            document.getElementById('right-name').innerText = rightItem.name;
-        }
-
-        function showGameOver() {
-            document.getElementById('game-over').style.display = 'flex';
-            document.getElementById('final-score').innerText = score;
-        }
-    </script>
-</body>
-</html>
+    <div id="name-screen">
+        <h1>ENTER PLAYER NAME</h1>
+        <input type="text" id="player-name" placeholder="Your Name..." maxlength="12">
+        <button onclick="startGame()" style="border-color: black; color: black
