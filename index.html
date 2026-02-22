@@ -7,72 +7,20 @@
     <style>
         body { font-family: 'Arial Black', sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        /* Containers */
-        #name-screen { position: fixed; inset: 0; background: #d4a017; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #000; }
+        /* Screens */
+        #name-screen, #leaderboard-screen { position: fixed; inset: 0; background: #d4a017; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #000; }
         #game-ui { display: none; width: 100%; height: 100%; flex-direction: row; }
-        
+        #leaderboard-screen { display: none; z-index: 1001; }
+
         /* UI Elements */
-        input { padding: 15px; font-size: 1.5rem; border: 4px solid #000; margin: 20px; text-align: center; width: 250px; }
+        input { padding: 15px; font-size: 1.5rem; border: 4px solid #000; margin: 10px; text-align: center; width: 250px; }
         .side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .left { background: #d4a017; color: #000; }
         .right { background: #1a1a1a; color: #fff; }
         
-        button { background: #fff; border: 4px solid #000; color: #000; padding: 15px 40px; font-size: 1.5rem; cursor: pointer; font-weight: bold; box-shadow: 5px 5px 0px #000; }
+        button { background: #fff; border: 4px solid #000; color: #000; padding: 12px 30px; font-size: 1.2rem; cursor: pointer; font-weight: bold; box-shadow: 5px 5px 0px #000; margin: 10px; }
+        button:hover { background: #f0f0f0; }
         button:active { transform: translate(2px, 2px); box-shadow: none; }
         
         h2 { font-size: 3rem; margin: 10px 0; text-transform: uppercase; }
-        .stat { font-size: 3.5rem; font-weight: bold; color: #000; }
-        .score-box { position: absolute; top: 20px; background: #fff; color: #000; padding: 10px 20px; border: 3px solid #000; font-weight: bold; z-index: 100; }
-        
-        #game-over { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-    </style>
-</head>
-<body>
-
-    <div id="name-screen">
-        <h1 style="font-size: 4rem; margin: 0;">BORED CHEESE</h1>
-        <input type="text" id="p-name" placeholder="Enter Name..." maxlength="10">
-        <button onclick="play()">PLAY GAME</button>
-    </div>
-
-    <div class="score-box" id="sb" style="display:none;">
-        <span id="display-name">PLAYER</span>: <span id="score">0</span>
-    </div>
-
-    <div id="game-ui">
-        <div class="side left">
-            <p>MONTHLY SEARCHES FOR</p>
-            <h2 id="l-name">---</h2>
-            <div class="stat" id="l-val">0</div>
-        </div>
-        <div class="side right">
-            <p>DOES</p>
-            <h2 id="r-name">---</h2>
-            <div style="margin: 20px 0;">
-                <button onclick="choose('h')">HIGHER</button>
-                <button onclick="choose('l')" style="background: #eee;">LOWER</button>
-            </div>
-            <p>HAVE MORE SEARCHES THAN <span id="vs">---</span>?</p>
-        </div>
-    </div>
-
-    <div id="game-over">
-        <h1 style="color: #d4a017; font-size: 5rem;">L</h1>
-        <h2 id="final-msg">Score: 0</h2>
-        <button onclick="location.reload()">RETRY</button>
-    </div>
-
-    <script>
-        const items = [
-            { n: "Cheddar", v: 5000000 }, { n: "Mozzarella", v: 8200000 },
-            { n: "Sambucha", v: 4100000 }, { n: "JackSucksAtLife", v: 2500000 },
-            { n: "MrBeast", v: 95000000 }, { n: "Minecraft", v: 120000000 },
-            { n: "Roblox", v: 90000000 }, { n: "Brie", v: 3400000 }
-        ];
-
-        let curScore = 0;
-        let left, right;
-
-        function play() {
-            const name = document.getElementById('p-name').value || "Legend";
-            document
+        .stat { font-
