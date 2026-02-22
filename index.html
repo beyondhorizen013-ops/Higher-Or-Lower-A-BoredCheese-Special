@@ -5,167 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BoredCheese | Higher or Lower</title>
     <style>
-        body { font-family: 'Arial Black', sans-serif; background: #000; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        body { font-family: 'Arial Black', sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        /* Name Input Screen */
-        #name-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #d4a017; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; color: black; }
-        #player-name { padding: 15px; font-size: 1.5rem; border: 4px solid black; margin-bottom: 20px; text-align: center; font-family: inherit; width: 250px; }
-
-        /* Game Layout */
-        .game-container { display: none; width: 100%; height: 100%; }
-        .side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; transition: 0.5s; position: relative; }
-        .left { background: #d4a017; color: black; border-right: 2px solid #000; }
-        .right { background: #1a1a1a; }
+        /* Containers */
+        #name-screen { position: fixed; inset: 0; background: #d4a017; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #000; }
+        #game-ui { display: none; width: 100%; height: 100%; flex-direction: row; }
         
-        h2 { font-size: 3.5rem; margin: 10px 0; text-transform: uppercase; line-height: 1; }
-        .score-hud { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 10px 25px; border: 4px solid black; font-size: 1.2rem; z-index: 10; font-weight: bold; display: none; }
+        /* UI Elements */
+        input { padding: 15px; font-size: 1.5rem; border: 4px solid #000; margin: 20px; text-align: center; width: 250px; }
+        .side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .left { background: #d4a017; color: #000; }
+        .right { background: #1a1a1a; color: #fff; }
         
-        .btn-container { margin: 20px 0; }
-        button { background: #fff; border: 4px solid #000; color: #000; padding: 15px 40px; font-size: 1.5rem; cursor: pointer; margin: 10px; font-family: inherit; transition: 0.1s; font-weight: bold; box-shadow: 5px 5px 0px #d4a017; }
-        button:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0px #000; }
-        button:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
-        .stat { font-size: 3rem; font-weight: bold; margin: 10px 0; }
-
-        /* Game Over */
-        #game-over { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
-        .leaderboard { margin: 20px 0; background: #222; padding: 20px; border: 4px solid #d4a017; min-width: 320px; color: white; }
-        .leaderboard-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #d4a017; padding: 10px 0; font-size: 1.2rem; }
+        button { background: #fff; border: 4px solid #000; color: #000; padding: 15px 40px; font-size: 1.5rem; cursor: pointer; font-weight: bold; box-shadow: 5px 5px 0px #000; }
+        button:active { transform: translate(2px, 2px); box-shadow: none; }
+        
+        h2 { font-size: 3rem; margin: 10px 0; text-transform: uppercase; }
+        .stat { font-size: 3.5rem; font-weight: bold; color: #000; }
+        .score-box { position: absolute; top: 20px; background: #fff; color: #000; padding: 10px 20px; border: 3px solid #000; font-weight: bold; z-index: 100; }
+        
+        #game-over { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="name-screen">
-        <h1 style="font-size: 3rem;">BORED CHEESE</h1>
-        <p>ENTER PLAYER NAME</p>
-        <input type="text" id="player-name" placeholder="Name..." maxlength="12">
-        <button onclick="startGame()" style="box-shadow: 5px 5px 0px #fff;">PLAY NOW</button>
+        <h1 style="font-size: 4rem; margin: 0;">BORED CHEESE</h1>
+        <input type="text" id="p-name" placeholder="Enter Name..." maxlength="10">
+        <button onclick="play()">PLAY GAME</button>
     </div>
 
-    <div class="score-hud" id="hud">
-        <span id="hud-name">PLAYER</span>: <span id="current-score">0</span>
+    <div class="score-box" id="sb" style="display:none;">
+        <span id="display-name">PLAYER</span>: <span id="score">0</span>
     </div>
 
-    <div class="game-container" id="main-game">
+    <div id="game-ui">
         <div class="side left">
-            <p>SEARCH VOLUME FOR</p>
-            <h2 id="left-name">---</h2>
-            <div class="stat" id="left-val">0</div>
-            <p>PER MONTH</p>
+            <p>MONTHLY SEARCHES FOR</p>
+            <h2 id="l-name">---</h2>
+            <div class="stat" id="l-val">0</div>
         </div>
-
         <div class="side right">
             <p>DOES</p>
-            <h2 id="right-name">---</h2>
-            <div class="btn-container">
-                <button onclick="checkAnswer('higher')">▲ HIGHER</button>
-                <button onclick="checkAnswer('lower')">▼ LOWER</button>
+            <h2 id="r-name">---</h2>
+            <div style="margin: 20px 0;">
+                <button onclick="choose('h')">HIGHER</button>
+                <button onclick="choose('l')" style="background: #eee;">LOWER</button>
             </div>
-            <p>HAVE MORE SEARCHES THAN <span id="vs-name">---</span>?</p>
+            <p>HAVE MORE SEARCHES THAN <span id="vs">---</span>?</p>
         </div>
     </div>
 
     <div id="game-over">
-        <h1 style="color: #d4a017; font-size: 4rem;">WRONG!</h1>
-        <div class="leaderboard">
-            <h3 style="margin-top:0;">🧀 LOCAL TOP SCORES</h3>
-            <div id="leaderboard-list"></div>
-        </div>
-        <button onclick="location.reload()">TRY AGAIN</button>
+        <h1 style="color: #d4a017; font-size: 5rem;">L</h1>
+        <h2 id="final-msg">Score: 0</h2>
+        <button onclick="location.reload()">RETRY</button>
     </div>
 
     <script>
-        const data = [
-            { name: "Cheddar", value: 5000000 },
-            { name: "Mozzarella", value: 8200000 },
-            { name: "Sambucha", value: 4100000 },
-            { name: "JackSucksAtLife", value: 2500000 },
-            { name: "MrBeast", value: 95000000 },
-            { name: "Swiss Cheese", value: 1200000 },
-            { name: "Brie", value: 3400000 },
-            { name: "Parmesan", value: 6800000 },
-            { name: "Gouda", value: 2900000 },
-            { name: "Minecraft", value: 120000000 },
-            { name: "Roblox", value: 90000000 },
-            { name: "Cheese Strings", value: 450000 }
+        const items = [
+            { n: "Cheddar", v: 5000000 }, { n: "Mozzarella", v: 8200000 },
+            { n: "Sambucha", v: 4100000 }, { n: "JackSucksAtLife", v: 2500000 },
+            { n: "MrBeast", v: 95000000 }, { n: "Minecraft", v: 120000000 },
+            { n: "Roblox", v: 90000000 }, { n: "Brie", v: 3400000 }
         ];
 
-        let score = 0;
-        let playerName = "Player";
-        let leftItem, rightItem;
+        let curScore = 0;
+        let left, right;
 
-        function startGame() {
-            const input = document.getElementById('player-name').value;
-            if (input.trim() !== "") playerName = input;
-            
-            document.getElementById('hud-name').innerText = playerName.toUpperCase();
-            document.getElementById('name-screen').style.display = 'none';
-            document.getElementById('main-game').style.display = 'flex';
-            document.getElementById('hud').style.display = 'block';
-            
-            setupInitialItems();
-        }
-
-        function setupInitialItems() {
-            leftItem = data[Math.floor(Math.random() * data.length)];
-            pickNewRightItem();
-            updateUI();
-        }
-
-        function pickNewRightItem() {
-            do {
-                rightItem = data[Math.floor(Math.random() * data.length)];
-            } while (rightItem.name === leftItem.name);
-        }
-
-        function updateUI() {
-            document.getElementById('left-name').innerText = leftItem.name;
-            document.getElementById('left-val').innerText = leftItem.value.toLocaleString();
-            document.getElementById('right-name').innerText = rightItem.name;
-            document.getElementById('vs-name').innerText = leftItem.name.toUpperCase();
-        }
-
-        function checkAnswer(guess) {
-            const isHigher = rightItem.value >= leftItem.value;
-            const won = (guess === 'higher' && isHigher) || (guess === 'lower' && !isHigher);
-
-            if (won) {
-                score++;
-                document.getElementById('current-score').innerText = score;
-                leftItem = rightItem;
-                pickNewRightItem();
-                updateUI();
-            } else {
-                endGame();
-            }
-        }
-
-        function endGame() {
-            document.getElementById('main-game').style.display = 'none';
-            document.getElementById('hud').style.display = 'none';
-            document.getElementById('game-over').style.display = 'flex';
-            
-            saveScore(playerName, score);
-            displayLeaderboard();
-        }
-
-        function saveScore(name, score) {
-            let scores = JSON.parse(localStorage.getItem('cheeseScores')) || [];
-            scores.push({ name, score });
-            scores.sort((a, b) => b.score - a.score);
-            scores = scores.slice(0, 5); 
-            localStorage.setItem('cheeseScores', JSON.stringify(scores));
-        }
-
-        function displayLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            const scores = JSON.parse(localStorage.getItem('cheeseScores')) || [];
-            list.innerHTML = scores.map(s => `
-                <div class="leaderboard-item">
-                    <span>${s.name}</span>
-                    <span>${s.score}</span>
-                </div>
-            `).join('');
-        }
-    </script>
-</body>
-</html>
+        function play() {
+            const name = document.getElementById('p-name').value || "Legend";
+            document
